@@ -14,9 +14,15 @@ if os.environ.get("READTHEDOCS"):
     import doxygen
 
     doxygen.create_cmake_config()
-    doxygen.build()
+    build_path = doxygen.build()
+    source_path = os.path.join(os.path.dirname(__file__), "..", "..")
 
     html_extra_path = ["./api"]
+
+else:
+    # variables provided by CMake if not using RTD.
+    build_path = "@CMAKE_CURRENT_BINARY_DIR@/doc"
+    source_path = "@PROJECT_SOURCE_DIR@"
 
 # The suffix of source filenames.
 source_suffix = ".rst"
@@ -28,10 +34,8 @@ master_doc = "index"
 project = u"Awesome Project"
 copyright = u"2023, Jeremy Retailleau"
 
-_root = os.path.join(os.path.dirname(__file__), "..", "..")
-
 # Version
-with open(os.path.join(_root, "CMakeLists.txt")) as _version_file:
+with open(os.path.join(source_path, "CMakeLists.txt")) as _version_file:
     _version = re.search(
         r"project\(.* VERSION ([\d\\.]+)", _version_file.read(), re.DOTALL
     ).group(1)
@@ -41,8 +45,8 @@ release = _version
 
 doxylink = {
     "awesome-project-cpp": (
-        os.path.join(_root, "build", "doc", "doc", "awesome-project.tag"),
-        os.path.join(_root, "build", "doc", "doc", "doxygen")
+        os.path.join(build_path, "awesome-project.tag"),
+        "./doxygen"
     )
 }
 
